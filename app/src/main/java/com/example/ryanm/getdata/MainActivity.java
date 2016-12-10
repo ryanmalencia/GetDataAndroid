@@ -1,10 +1,15 @@
 package com.example.ryanm.getdata;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import org.json.JSONArray;
@@ -16,20 +21,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
-    TextView theresponse;
-    ProgressBar progress;
     static final String apiurl = "http://10.0.0.57:9999";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        theresponse = (TextView)findViewById(R.id.response_view);
-        progress = (ProgressBar) findViewById(R.id.progress);
         Button mybutton = (Button) findViewById(R.id.mybutton);
         mybutton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                new RetrieveData().execute();
+                    new RetrieveData().execute();
             }
         });
     }
@@ -42,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     }
     class RetrieveData extends AsyncTask<Void, Void, String> {
         protected void onPreExecute() {
-            progress.setVisibility(View.VISIBLE);
-            theresponse.setText("");
         }
 
         protected String doInBackground(Void... urls){
@@ -79,20 +78,26 @@ public class MainActivity extends AppCompatActivity {
             if(response == null) {
                 response = "ERROR";
             }
+            LinearLayout layout = (LinearLayout)findViewById(R.id.data_layout);
             response = cleanJson(response);
-            progress.setVisibility(View.GONE);
-            String output = "";
             try{
                 JSONObject object = (JSONObject) new JSONTokener(response).nextValue();
                 JSONArray array = object.getJSONArray("machines");
-                System.out.println(array.getJSONObject(0).getString("Name"));
-                output = output + array.getJSONObject(0).getString("Name");
-                System.out.println(array.getString(1));
+                layout.removeAllViews();
+                for(int i = 0; i < array.length(); i++)
+                {
+                    TextView temp = new TextView(getApplicationContext());
+                    temp.setGravity(Gravity.CENTER);
+                    temp.setPadding(0,5,0,5);
+                    temp.setBackgroundColor(Color.BLUE);
+                    temp.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    temp.setText(array.getJSONObject(i).getString("Name"));
+                    layout.addView(temp);
+                }
             }catch(Exception e)
             {
                 System.out.println(e.getMessage());
             }
-            theresponse.setText(output);
         }
     }
 }
