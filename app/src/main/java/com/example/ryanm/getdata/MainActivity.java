@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         protected String doInBackground(Void... urls){
             try {
-                URL url = new URL(apiurl + "/api/machine/getallmachines");
+                URL url = new URL(apiurl + "/api/agent/getallagents");
                 System.out.println(url.toString());
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -80,9 +80,10 @@ public class MainActivity extends AppCompatActivity {
             }
             LinearLayout layout = (LinearLayout)findViewById(R.id.data_layout);
             response = cleanJson(response);
+            System.out.println("Response: " + response);
             try{
                 JSONObject object = (JSONObject) new JSONTokener(response).nextValue();
-                JSONArray array = object.getJSONArray("machines");
+                JSONArray array = object.getJSONArray("Agents");
                 layout.removeAllViews();
                 for(int i = 0; i < array.length(); i++)
                 {
